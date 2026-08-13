@@ -15,4 +15,4 @@ Job descriptions are long — don't ask the user to paste one directly into chat
    - Any notable concerns (pay, location, contract vs. FTE, stack fit, etc.)
    - A clear recommendation on whether to pursue it
 
-Stop after giving this feedback. Do not draft a resume, generate a PDF, or take any further action until the user explicitly says to proceed — but do encourage them toward that next step rather than just going quiet (see the core-value note on momentum in this workspace's `CLAUDE.md`).
+Stop after giving this feedback. Do not draft a resume, generate a PDF, or take any further action until the user explicitly says to proceed — but do encourage them toward that next step rather than just going quiet (see the momentum note in the `resume-tailoring` skill's checkpoints section).
