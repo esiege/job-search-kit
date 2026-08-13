@@ -17,19 +17,36 @@ The goal is that the person never has to know a slash command exists — the wor
 **For Claude Code, this is genuinely zero-config** — no per-workspace file copying needed. `hooks/session-start-check.ps1` runs automatically on `SessionStart` for every workspace where the plugin is loaded: it checks whether a master resume exists, whether it has a matching PDF, and injects the right instruction into context accordingly (ask for source material / offer to generate the missing PDF / offer both continuing the baseline or starting a tailored application). This only works because it's a real plugin hook, not a file that has to be copied in — see the note below on why an earlier version of this used a `CLAUDE.md` template and why that was a workaround, not the real mechanism.
 
 1. Create an empty folder for them (e.g. sibling to this repo, like `C:\Users\esieg\source\repos\<person>-resume`). Nothing needs to be copied into it.
-2. Open a Claude Code session rooted in that folder with this plugin loaded. Either works:
-   - **From the marketplace** (published — see below):
+2. Open that folder with the plugin loaded — steps differ depending on which Claude Code surface is being used:
+
+   **Terminal CLI:**
+   - From the marketplace (published):
      ```
      cd "C:\Users\esieg\source\repos\<person>-resume"
      claude
      /plugin marketplace add esiege/job-search-kit
      /plugin install job-search-kit@job-search-kit
      ```
-   - **By local path** (for developing/testing the plugin itself):
+   - By local path (for developing/testing the plugin itself):
      ```
      cd "C:\Users\esieg\source\repos\<person>-resume"
      claude --plugin-dir "C:\Users\esieg\source\repos\job-search-kit"
      ```
+
+   **VSCode extension** (no `--plugin-dir` equivalent flag exists here — a local path has to be added as a marketplace source instead):
+   - File → Open Folder → the person's workspace folder.
+   - In the chat panel, type `/plugins` to open the graphical "Manage plugins" panel (or type the commands directly — both work).
+   - From the marketplace (published):
+     ```
+     /plugin marketplace add esiege/job-search-kit
+     /plugin install job-search-kit@job-search-kit
+     ```
+   - By local path (for developing/testing the plugin itself):
+     ```
+     /plugin marketplace add C:\Users\esieg\source\repos\job-search-kit
+     /plugin install job-search-kit@job-search-kit
+     ```
+   - Recent versions activate immediately; if the install summary says "Run `/reload-plugins` to activate," run that in the chat (not a VSCode restart).
 3. That's it. The `SessionStart` hook fires before the first message, so the agent already knows the workspace is empty and asks for source material (LinkedIn export, old resumes, project notes, anything relevant), tells the person to drop it in `Intake/`, and works through it conversationally (via the `intake` skill/`/intake` command) before drafting a master resume. Nothing downstream happens until that's reviewed and confirmed — that's the most important step to get right.
 
 **For GitHub Copilot**, there's no plugin/hook system to hook into, so the onboarding instructions do have to be a real file in the workspace — copy the template in before the first session:
