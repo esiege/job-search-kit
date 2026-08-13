@@ -1,0 +1,15 @@
+{
+  "name": "job-search-kit",
+  "owner": {
+    "name": "esiege",
+    "url": "https://github.com/esiege"
+  },
+  "plugins": [
+    {
+      "name": "job-search-kit",
+      "source": "./",
+      "description": "AI-assisted job search workflow: fit/gap feedback on job descriptions, tailored resumes with branded PDF generation, and interview-prep artifacts. Reframes real experience per job description, never fabricates.",
+      "author": { "name": "Jesse Swartz" }
+    }
+  ]
+}
