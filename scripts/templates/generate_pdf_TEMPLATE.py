@@ -113,13 +113,15 @@ class ResumePDF(FPDF):
 
         self.set_font(self.font_name, '', 9.5)
         self.set_text_color(80, 80, 80)
-        parts = [
+        # Skip empty fields (e.g. no LinkedIn/GitHub) - joining unconditionally
+        # produces an ugly double-pipe gap for identities missing a field.
+        parts = [p for p in (
             self.identity["location"],
             self.identity["email"],
             self.identity["phone"],
             self.identity["linkedin"],
             self.identity["github"],
-        ]
+        ) if p]
         line = '  |  '.join(parts)
         total_width = self.get_string_width(line)
         self.set_x((self.w - total_width) / 2)

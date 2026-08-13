@@ -57,3 +57,8 @@ The overwrite-guard hook already blocks editing an existing `generate_pdf_*.py`/
 3. Log the new version in `PDF_GENERATION_LOG.md` same as any other script — the whole point of that log is that nothing generated is ever un-reproducible, including intermediate correction rounds.
 
 The current/latest script and PDF never carry a `vN` stamp — only superseded ones do. This versioning is separate from the per-company/theme naming convention (a new company always gets its own `generate_pdf_<company>.py`; `vN` stamps track correction rounds *within* one company's resume).
+
+## Keep the .txt, Generator Script, and PDF in Sync — Always a Triple
+Any time a resume `.txt` is created or its content changes (master or tailored), the same three things should exist and match: the `.txt`, a `generate_pdf_<theme>.py` script, and the `.pdf` it produces. Don't leave a `.txt` sitting without a PDF counterpart — offer to generate it proactively as part of finishing that step, not as a separate thing the user has to remember to ask for. This applies to the master resume too (theme name `general`, e.g. `generate_pdf_general.py` → `Resume - <Name> - General.pdf`), not just per-application tailored ones.
+
+If any one of the three is edited later, the others need to be regenerated to match (following the versioning rule above) — never let the `.txt` and the PDF quietly drift apart.
