@@ -47,3 +47,13 @@ This is the approved resume PDF layout. Every `generate_pdf_<company>.py` script
 
 ## Identity Parameterization (why this differs from the original single-person script)
 The layout spec above was originally implemented for one person with a hardcoded name/contact line. Since this kit serves a different person per workspace, every identity field (name, title, location, phone, email, links) must be read from that workspace's facts file, never hardcoded in the script. `generate_pdf_TEMPLATE.py` takes an `identity` dict for exactly this reason — do not reintroduce hardcoded personal details when copying it.
+
+## Formatting Corrections Are Expected — Version the History
+PDF formatting from this pipeline is currently inconsistent (cut-off lines, bad margins/padding, overlapping text — see the plugin's known-issues notes). Tell the user this up front so a correction round isn't a surprise, and expect more than one round before it looks right.
+
+The overwrite-guard hook already blocks editing an existing `generate_pdf_*.py`/`generate_docx_*.py` in place, and blocks a `Write` that would silently overwrite one — so a correction can't just clobber the current script. Instead, when the user asks for a formatting correction to the *same* resume:
+1. Rename the current `generate_pdf_<theme>.py` (and its output PDF) to add a version stamp — `v0` for the first superseded version, `v1` for the next, incrementing from whatever `vN` stamps already exist for that theme.
+2. Write the corrected script to the original, unversioned `generate_pdf_<theme>.py` name (now free again after the rename, so the hook allows it) and regenerate the PDF there.
+3. Log the new version in `PDF_GENERATION_LOG.md` same as any other script — the whole point of that log is that nothing generated is ever un-reproducible, including intermediate correction rounds.
+
+The current/latest script and PDF never carry a `vN` stamp — only superseded ones do. This versioning is separate from the per-company/theme naming convention (a new company always gets its own `generate_pdf_<company>.py`; `vN` stamps track correction rounds *within* one company's resume).
