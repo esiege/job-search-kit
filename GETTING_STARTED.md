@@ -16,7 +16,22 @@ The goal is that the person never has to know a slash command exists — the wor
 
 **For Claude Code, this is genuinely zero-config** — no per-workspace file copying needed. `hooks/session-start-check.ps1` runs automatically on `SessionStart` for every workspace where the plugin is loaded: it checks whether a master resume exists, whether it has a matching PDF, and injects the right instruction into context accordingly (ask for source material / offer to generate the missing PDF / offer both continuing the baseline or starting a tailored application). This only works because it's a real plugin hook, not a file that has to be copied in — see the note below on why an earlier version of this used a `CLAUDE.md` template and why that was a workaround, not the real mechanism.
 
-1. Create an empty folder for them (e.g. sibling to this repo, like `C:\Users\esieg\source\repos\<person>-resume`). Nothing needs to be copied into it.
+### Install the plugin once (recommended — non-interactive, user scope)
+`claude plugin marketplace add` and `claude plugin install` are real CLI subcommands, not just in-chat slash commands — they work from an ordinary terminal without ever opening an interactive Claude Code session:
+
+```
+claude plugin marketplace add esiege/job-search-kit
+claude plugin install job-search-kit@job-search-kit
+```
+
+Installing this way puts the plugin at **user scope** — available to every workspace and every future session (CLI or VSCode extension), not just one folder. So this only needs to be run **once ever** on a given machine, not per new person's workspace. Run it from VSCode's integrated terminal too if that's the surface being used — it's the same underlying CLI either way.
+
+**The catch:** plugins attach at session start. If a Claude Code session (CLI or VSCode extension) is already running when this is installed, that session won't pick it up — it'll be live starting with the next fresh session.
+
+### Per-workspace / interactive alternatives
+If a one-time user-scope install isn't what's wanted (e.g. testing local, unpushed plugin changes for just one workspace), the interactive per-session methods still work:
+
+1. Create an empty folder for the person (e.g. sibling to this repo, like `C:\Users\esieg\source\repos\<person>-resume`). Nothing needs to be copied into it.
 2. Open that folder with the plugin loaded — steps differ depending on which Claude Code surface is being used:
 
    **Terminal CLI:**
@@ -47,7 +62,8 @@ The goal is that the person never has to know a slash command exists — the wor
      /plugin install job-search-kit@job-search-kit
      ```
    - Recent versions activate immediately; if the install summary says "Run `/reload-plugins` to activate," run that in the chat (not a VSCode restart).
-3. That's it. The `SessionStart` hook fires before the first message, so the agent already knows the workspace is empty and asks for source material (LinkedIn export, old resumes, project notes, anything relevant), tells the person to drop it in `Intake/`, and works through it conversationally (via the `intake` skill/`/intake` command) before drafting a master resume. Nothing downstream happens until that's reviewed and confirmed — that's the most important step to get right.
+
+Either way (one-time user-scope install, or per-workspace): once the plugin is loaded, the `SessionStart` hook fires before the first message, so the agent already knows whether the workspace is empty and asks for source material (LinkedIn export, old resumes, project notes, anything relevant), tells the person to drop it in `Intake/`, and works through it conversationally (via the `intake` skill/`/intake` command) before drafting a master resume. Nothing downstream happens until that's reviewed and confirmed — that's the most important step to get right.
 
 **For GitHub Copilot**, there's no plugin/hook system to hook into, so the onboarding instructions do have to be a real file in the workspace — copy the template in before the first session:
 ```
