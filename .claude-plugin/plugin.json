@@ -1,0 +1,6 @@
+{
+  "name": "job-search-kit",
+  "description": "AI-assisted job search workflow: fit/gap feedback on job descriptions, tailored resumes with branded PDF generation, and interview-prep artifacts. Reframes real experience per job description, never fabricates.",
+  "version": "0.1.0",
+  "author": { "name": "Jesse Swartz" }
+}
