@@ -36,7 +36,7 @@ Before generating the first PDF, say plainly: **formatting is currently inconsis
 Every correction round after the first supersedes something that already exists. Before overwriting:
 1. Rename the file being superseded with a version stamp — `v0` for the first superseded version, `v1` for the next (check what `vN` stamps already exist and increment).
 2. Write the corrected content to the original, unversioned filename.
-3. The current/latest version never carries a `vN` stamp. Example: `Resume - Amber Swartz - Master.txt` (current) sitting next to `Resume - Amber Swartz - Master.v0.txt` (superseded).
+3. The current/latest version never carries a `vN` stamp. Example: `Resume - Jane Doe - Master.txt` (current) sitting next to `Resume - Jane Doe - Master.v0.txt` (superseded).
 
 Applies to resume `.txt` files, `generate_pdf_<theme>.py` scripts, and their PDFs alike.
 

@@ -75,10 +75,17 @@ If the plugin gets edited during a Claude Code session, run `/reload-plugins` to
 
 **Why a hook instead of a `CLAUDE.md` template:** an earlier version of this plugin shipped a `CLAUDE_TEMPLATE.md` that had to be manually copied into each new workspace as `CLAUDE.md`. That worked, but it wasn't actually "part of the plugin" in any enforced sense — Claude Code plugins can't ship a `CLAUDE.md` that auto-loads into project context, so the behavior silently didn't happen for anyone who created a workspace without following this exact runbook. The `SessionStart` hook is the real plugin-native mechanism: it's guaranteed to fire for every session wherever the plugin is installed, with no per-workspace setup step to forget.
 
+## Finding jobs to apply to
+1. `/job-search-preferences` — one-time (then update as needed): target titles, location/remote constraints, deal-breakers, comp floor if shared. Stored in `job_search_preferences.md`, separate from the resume-tone facts file.
+2. `/find-jobs` — searches for matching postings using a two-tier approach: direct lookup against known companies' ATS APIs (Greenhouse, Lever, Workable, SmartRecruiters, Ashby — see `JOB_SEARCH_API_ENDPOINTS.md` in the Resume Workspace project) first, falling back to `WebSearch`/`WebFetch` for anything not resolvable that way. Every job that makes the shortlist gets recorded immediately (JD file + a row in `JOB_SEARCH_LOG.md`, status `Viewed`) before it's even presented — this isn't conditional on the person deciding to pursue it.
+3. As the person reacts to the shortlist, confirmed standing preferences ("skip staffing agencies") get written into `job_search_preferences.md`'s "Learned from feedback" section — never inferred silently.
+
+This is genuinely two-tier by design, not scraping-only: real testing found direct ATS API lookups dramatically more reliable than scraping HTML career pages (see `JOB_SEARCH_IMPLEMENTATION_PLAN.md`'s Phase 0 findings), so `WebSearch`/`WebFetch` is the fallback, not the primary method.
+
 ## Per-application loop
-Once the master resume is confirmed, for each job:
+Once the master resume is confirmed (and optionally, a job found via `/find-jobs`), for each job:
 1. `/evaluate-jd` — fit/gap feedback, stops and waits for a go-ahead
-2. `/tailor-resume` — drafts the tailored resume, stops and waits for approval
+2. `/tailor-resume` — drafts the tailored resume, stops and waits for approval. If the job came from `/find-jobs`, its `JOB_SEARCH_LOG.md` status updates to `Resume Created` automatically at this point.
 3. `/generate-pdf` — copies the template generator to a new `generate_pdf_<company>.py`, runs it, logs it to `PDF_GENERATION_LOG.md`
 
 Each step is a deliberate checkpoint — there's no "do everything" command on purpose, so a human approves every artifact before it's created.
@@ -90,3 +97,5 @@ Each step is a deliberate checkpoint — there's no "do everything" command on p
 - **PDF generation is consistently sloppy** (cut-off lines, bad margins/padding, overlapping text) — tracked in `KNOWN_ISSUES.md`, not yet fixed. The workflow is designed around this (upfront expectation-setting, versioned correction rounds), but the underlying generator itself still needs work.
 - `.doc`/`.docx` files can't be trusted by extension alone — a real intake run found a `.doc` that was actually RTF. `extract_docx.py` failing is the signal to fall back to `extract_rtf.py` (see `skills/intake/SKILL.md`).
 - Interview-prep artifacts (cheatsheet, TMAY, mock Q&A) aren't built yet — planned as v1.1, after the core loop has real-world use.
+- **`/find-jobs` hasn't had a real dry run against an actual person's preferences yet.** The search logic (`job-search` skill, `query_job_boards.py`) was validated extensively in Phase 0 with real companies and real API calls, but always run manually/conversationally, not yet through the actual `/find-jobs`/`/job-search-preferences` commands end to end. That dry run is the next real gate before this is considered done (see `JOB_SEARCH_IMPLEMENTATION_PLAN.md`'s build order) — same spirit as the intake dry run was for the original resume pipeline.
+- `/find-jobs` scheduling and email notifications (v2/v3) aren't built yet — see `JOB_SEARCH_IMPLEMENTATION_PLAN.md`.
