@@ -6,6 +6,8 @@ description: How to turn a person's raw zip of resume material into a master res
 
 Intake is one-time setup per person. Everything downstream (fit/gap feedback, tailoring, PDFs, interview prep) depends on the master resume being accurate — this is the most important step to get right, not a formality to rush through.
 
+**Path note:** every `scripts/...` path in this skill refers to a file bundled *inside this plugin*, not the workspace. Resolve it against the plugin root path provided in your session's `SessionStart` context (e.g. read `<plugin root>/scripts/templates/X`), never as a bare path relative to the workspace — the workspace has no `scripts/` folder of its own.
+
 ## Inputs
 A zip of whatever the person has: old resumes, LinkedIn export, cover letters, notes. Confirmed formats to support: PDF, plain text, HTML, `.docx`, and images (photos/scans of documents or certificates).
 

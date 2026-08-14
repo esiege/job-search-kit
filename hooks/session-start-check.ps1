@@ -1,11 +1,25 @@
+param([string]$PluginRoot)
+
 $workspaceRoot = $env:CLAUDE_PROJECT_DIR
 if (-not $workspaceRoot) { $workspaceRoot = (Get-Location).Path }
+
+# The agent's cwd is the person's workspace, not this plugin's own install
+# location - bundled files (scripts/templates/*, scripts/job_search/*, etc.)
+# can't be found with a bare relative path. Pass the resolved plugin root
+# through so skills/commands can construct absolute paths correctly. This
+# is the one reliable channel for this - ${CLAUDE_PLUGIN_ROOT} substitution
+# only happens in hooks.json's command string, not as something the agent
+# can read directly via an env var during normal tool calls.
+$pluginRootNote = ""
+if ($PluginRoot) {
+    $pluginRootNote = " This plugin's own bundled files (templates, scripts) live at `"$PluginRoot`" - use that as the base path whenever a skill or command references something like scripts/templates/X or scripts/job_search/Y.py, rather than treating it as relative to this workspace."
+}
 
 function Emit($context) {
     $out = @{
         hookSpecificOutput = @{
             hookEventName = "SessionStart"
-            additionalContext = $context
+            additionalContext = $context + $pluginRootNote
         }
     } | ConvertTo-Json -Depth 5
     Write-Output $out

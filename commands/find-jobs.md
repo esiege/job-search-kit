@@ -3,7 +3,7 @@ description: Search for job postings matching this person's profile and preferen
 argument-hint: [optional: a specific company to check, or a search focus]
 ---
 
-Run a job search for this person, following the `job-search` skill.
+Run a job search for this person, following the `job-search` skill. (`scripts/...` paths below are bundled inside this plugin — resolve against the plugin root from your session's `SessionStart` context, not relative to the workspace.)
 
 1. Check for `job_search_preferences.md` in the workspace root. If it doesn't exist yet, run `/job-search-preferences` first — don't search with no criteria. If it exists but looks thin (e.g. no target titles), confirm with the person whether it's ready to search from before proceeding.
 2. Build search input from the master resume + `job_search_preferences.md` (target titles/roles as keywords, location as local area, any companies already known from preferences or prior search rounds).

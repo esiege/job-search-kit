@@ -63,7 +63,10 @@ If a one-time user-scope install isn't what's wanted (e.g. testing local, unpush
      ```
    - Recent versions activate immediately; if the install summary says "Run `/reload-plugins` to activate," run that in the chat (not a VSCode restart).
 
-Either way (one-time user-scope install, or per-workspace): once the plugin is loaded, the `SessionStart` hook fires before the first message, so the agent already knows whether the workspace is empty and asks for source material (LinkedIn export, old resumes, project notes, anything relevant), tells the person to drop it in `Intake/`, and works through it conversationally (via the `intake` skill/`/intake` command) before drafting a master resume. Nothing downstream happens until that's reviewed and confirmed — that's the most important step to get right.
+Either way (one-time user-scope install, or per-workspace): once the plugin is loaded, the `SessionStart` hook fires before the first message, so the agent already knows whether the workspace is empty and asks for source material (LinkedIn export, old resumes, project notes, anything relevant), tells the person to drop it in `Intake/`, and works through it conversationally (via the `intake` skill/`/job-search-kit:intake` command) before drafting a master resume. Nothing downstream happens until that's reviewed and confirmed — that's the most important step to get right.
+
+### Command invocation — use the namespaced form
+**Confirmed real-world behavior (VSCode extension): commands need the plugin-name prefix, e.g. `/job-search-kit:find-jobs`, not bare `/find-jobs`.** The bare form appearing in a plugin's own command list/autocomplete is not the same as it being invokable directly — traced this down after `/find-jobs` and every other command silently didn't exist in an otherwise correctly-installed, correctly-loaded plugin (confirmed installed and enabled in `/plugins`, confirmed present and current in the local plugin cache on disk, confirmed a genuinely fresh session) — typing `/job-search-kit:` and letting autocomplete finish it was what actually worked. Use the namespaced form for every command below; if a bare form also happens to work in a given environment, treat that as a bonus, not something to rely on.
 
 **For GitHub Copilot**, there's no plugin/hook system to hook into, so the onboarding instructions do have to be a real file in the workspace — copy the template in before the first session:
 ```
@@ -76,17 +79,17 @@ If the plugin gets edited during a Claude Code session, run `/reload-plugins` to
 **Why a hook instead of a `CLAUDE.md` template:** an earlier version of this plugin shipped a `CLAUDE_TEMPLATE.md` that had to be manually copied into each new workspace as `CLAUDE.md`. That worked, but it wasn't actually "part of the plugin" in any enforced sense — Claude Code plugins can't ship a `CLAUDE.md` that auto-loads into project context, so the behavior silently didn't happen for anyone who created a workspace without following this exact runbook. The `SessionStart` hook is the real plugin-native mechanism: it's guaranteed to fire for every session wherever the plugin is installed, with no per-workspace setup step to forget.
 
 ## Finding jobs to apply to
-1. `/job-search-preferences` — one-time (then update as needed): target titles, location/remote constraints, deal-breakers, comp floor if shared. Stored in `job_search_preferences.md`, separate from the resume-tone facts file.
-2. `/find-jobs` — searches for matching postings using a two-tier approach: direct lookup against known companies' ATS APIs (Greenhouse, Lever, Workable, SmartRecruiters, Ashby — see `JOB_SEARCH_API_ENDPOINTS.md` in the Resume Workspace project) first, falling back to `WebSearch`/`WebFetch` for anything not resolvable that way. Every job that makes the shortlist gets recorded immediately (JD file + a row in `JOB_SEARCH_LOG.md`, status `Viewed`) before it's even presented — this isn't conditional on the person deciding to pursue it.
+1. `/job-search-kit:job-search-preferences` — one-time (then update as needed): target titles, location/remote constraints, deal-breakers, comp floor if shared. Stored in `job_search_preferences.md`, separate from the resume-tone facts file.
+2. `/job-search-kit:find-jobs` — searches for matching postings using a two-tier approach: direct lookup against known companies' ATS APIs (Greenhouse, Lever, Workable, SmartRecruiters, Ashby — see `JOB_SEARCH_API_ENDPOINTS.md` in the Resume Workspace project) first, falling back to `WebSearch`/`WebFetch` for anything not resolvable that way. Every job that makes the shortlist gets recorded immediately (JD file + a row in `JOB_SEARCH_LOG.md`, status `Viewed`) before it's even presented — this isn't conditional on the person deciding to pursue it.
 3. As the person reacts to the shortlist, confirmed standing preferences ("skip staffing agencies") get written into `job_search_preferences.md`'s "Learned from feedback" section — never inferred silently.
 
 This is genuinely two-tier by design, not scraping-only: real testing found direct ATS API lookups dramatically more reliable than scraping HTML career pages (see `JOB_SEARCH_IMPLEMENTATION_PLAN.md`'s Phase 0 findings), so `WebSearch`/`WebFetch` is the fallback, not the primary method.
 
 ## Per-application loop
-Once the master resume is confirmed (and optionally, a job found via `/find-jobs`), for each job:
-1. `/evaluate-jd` — fit/gap feedback, stops and waits for a go-ahead
-2. `/tailor-resume` — drafts the tailored resume, stops and waits for approval. If the job came from `/find-jobs`, its `JOB_SEARCH_LOG.md` status updates to `Resume Created` automatically at this point.
-3. `/generate-pdf` — copies the template generator to a new `generate_pdf_<company>.py`, runs it, logs it to `PDF_GENERATION_LOG.md`
+Once the master resume is confirmed (and optionally, a job found via `/job-search-kit:find-jobs`), for each job:
+1. `/job-search-kit:evaluate-jd` — fit/gap feedback, stops and waits for a go-ahead
+2. `/job-search-kit:tailor-resume` — drafts the tailored resume, stops and waits for approval. If the job came from `/job-search-kit:find-jobs`, its `JOB_SEARCH_LOG.md` status updates to `Resume Created` automatically at this point.
+3. `/job-search-kit:generate-pdf` — copies the template generator to a new `generate_pdf_<company>.py`, runs it, logs it to `PDF_GENERATION_LOG.md`
 
 Each step is a deliberate checkpoint — there's no "do everything" command on purpose, so a human approves every artifact before it's created.
 

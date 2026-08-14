@@ -4,6 +4,8 @@ description: The approved resume PDF layout spec (fonts, spacing, header/footer 
 
 # PDF Layout Standards
 
+**Path note:** every `scripts/...` path in this skill refers to a file bundled *inside this plugin*, not the workspace. Resolve it against the plugin root path provided in your session's `SessionStart` context, never as a bare path relative to the workspace.
+
 This is the approved resume PDF layout. Every `generate_pdf_<company>.py` script must follow it. Never invent a new layout for a specific resume — copy `scripts/templates/generate_pdf_TEMPLATE.py` (see the `pdf-generation` step in `intake` / `generate-pdf` commands for identity-field wiring) and fill in that person's content.
 
 ## Font & Spacing

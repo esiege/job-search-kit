@@ -3,7 +3,7 @@ description: Generate the branded PDF for an already-approved tailored resume.
 argument-hint: [company or job description reference, if not obvious from context]
 ---
 
-Generate the PDF for the approved tailored resume for $ARGUMENTS, following `skills/pdf-layout-standards/SKILL.md`.
+Generate the PDF for the approved tailored resume for $ARGUMENTS, following `skills/pdf-layout-standards/SKILL.md`. (`scripts/...` paths below are bundled inside this plugin — resolve against the plugin root from your session's `SessionStart` context, not relative to the workspace.)
 
 **First run for this resume:**
 1. Copy `scripts/templates/generate_pdf_TEMPLATE.py` to a **new** file `generate_pdf_<company-or-theme>.py` in the person's workspace. Never edit an existing `generate_pdf_*.py` in place — the guard hook will block this anyway, but don't attempt it.

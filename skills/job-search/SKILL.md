@@ -4,6 +4,8 @@ description: How to find job postings matching a person's master resume and sear
 
 # Job Search
 
+**Path note:** every `scripts/...` path in this skill refers to a file bundled *inside this plugin*, not the workspace. Resolve it against the plugin root path provided in your session's `SessionStart` context, never as a bare path relative to the workspace.
+
 ## Prerequisites
 - Master resume must exist and be approved (per the `intake` skill) — job search draws on it for search terms and fit judgment.
 - `job_search_preferences.md` should exist. If it doesn't yet, capture it first (see `/find-jobs`'s flow) before searching — target titles, location constraints, deal-breakers, comp floor if shared.
